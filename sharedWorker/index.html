@@ -1,1 +1,58 @@
-
+<html lang="en" >
+  <head>
+    <meta charset="utf-g">
+  </head>
+  <style>
+    .main{
+      width: 500px;
+      height: 500px;
+      background-color: #223
+    }
+    .space{
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .number{
+      font-size: 30px;
+    }
+    .formBase form{
+      display: flex;
+      flex-direction: column;
+    }
+    #input{
+      width: 100%
+    }
+    #btn{
+      padding: 20px;
+      background-color: blue;
+    }
+  </style>
+  <body>
+    <main>
+      <div class="space">
+        <h1>How many TABS of this page do you have open</h1>
+        <span class="number">0</span>
+      </div>
+      <div class="formBase">
+        <form>
+          <input type="text" placeholder="Send a message" id="input">
+          <input type="submit" id="btn">
+        </form>
+      </div>
+      <div class="messages">
+        <ul>
+          <li>no messages sent</li>
+        </ul>
+      </div>
+    </main>
+  </body>
+  <script>
+    let worker = new sharedWorker("./sharedWorker.js")
+    worker.ports.onmessage=(evt)=>{
+      console.log(evt.data)
+      document.querySelector(".number").innerHtml = evt.data
+    }
+    worker.ports.postmessage("count")
+  </script>
+</html>
