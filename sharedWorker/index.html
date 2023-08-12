@@ -12,6 +12,8 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      align-items: center;
+      text-align: center;
     }
     .number{
       font-size: 30px;
@@ -31,28 +33,20 @@
   <body>
     <main>
       <div class="space">
-        <h1>How many TABS of this page do you have open</h1>
+        <h1>This number will increase anytime you refresh it after you open it in a new page</h1>
         <span class="number">0</span>
-      </div>
-      <div class="formBase">
-        <form>
-          <input type="text" placeholder="Send a message" id="input">
-          <input type="submit" id="btn">
-        </form>
-      </div>
-      <div class="messages">
-        <ul>
-          <li>no messages sent</li>
-        </ul>
       </div>
     </main>
   </body>
   <script>
-    let worker = new sharedWorker("./sharedWorker.js")
-    worker.ports.onmessage=(evt)=>{
-      console.log(evt.data)
-      document.querySelector(".number").innerHtml = evt.data
+    onload=()=>{
+      let btn = document.querySelector('#btn')
+      let text = document.querySelector('#input')
+      let worker = new SharedWorker("./sharedworker.js")
+      worker.port.postMessage('')
+      worker.port.onmessage=(evt)=>{
+        document.querySelector(".number").innerHTML = evt.data
+      }
     }
-    worker.ports.postmessage("count")
   </script>
 </html>
