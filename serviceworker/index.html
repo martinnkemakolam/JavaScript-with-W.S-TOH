@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .out{
+        text-align: center;
+        width: 100vw;
+        height: 30px;
+        background-color: red;
+        color: black;
+        padding: 2px; 
+    }
+</style>
+<body>
+    <div class="out"></div>
+    <form action="">
+        <button type="submit" id="data">
+            fetch data
+        </button>
+    </form>
+    <script>
+        let newUser = document.querySelector('.out')
+        let serviceworker = navigator.serviceWorker.register('worker.js')
+        serviceworker.then((reg)=>{
+            if (reg.installing) {
+                newUser.innerHTML = 'new user'
+            }else if(reg.waiting){
+                newUser.innerHTML = `waiting phase`
+            }else if(reg.active){
+                newUser.innerHTML = `worker active`
+                console.log('change script')
+            }
+        })
+        serviceworker
+        .then(reg=> navigator.serviceWorker.ready)
+        .then(reg => {
+            document.querySelector('#data').onclick=(e)=>{
+                e.preventDefault()
+                reg.sync.register('demo')
+                navigator.serviceWorker.controller.postMessage('demmmo')
+            }
+        })
+        navigator.serviceWorker.addEventListener('message', evt=>{
+            console.log(evt.data)
+        })
+    </script>
+</body>
+</html>
