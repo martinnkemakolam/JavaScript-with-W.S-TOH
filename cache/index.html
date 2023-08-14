@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>getting info from cache</div>
+    <h1></h1>
+    <img src="" alt="empty for now">
+    <script>
+        let txtBlod = new Blob(
+            ['Hello world!'], {
+                type: 'text/plain'
+            }
+        )
+        let objUrl = URL.createObjectURL(txtBlod)
+        fetch(objUrl).then(res =>{
+            caches.open('v1').then(cache =>{
+                cache.put('text', res)
+                cache.add('/img.png')
+                URL.revokeObjectURL(objUrl)
+            })
+        })
+
+        caches.match('/text').then(cache => cache.text()).then(res =>{
+            setTimeout(()=>{
+                document.querySelector('h1').innerText = res
+                caches.match('/img.png').then(img =>img.blob()).then(img =>{
+                let fileReader = new FileReader()
+                fileReader.readAsDataURL(img)
+                fileReader.onload=()=>{
+                    console.log(fileReader.result)
+                    document.querySelector('img').src = fileReader.result
+                }
+            })
+            }, 2000)
+        })
+        /*
+        caches.has("NAME") – Check if the specified cache exists.
+• caches.open("NAME") – Opens the specified cache.
+• cache.addAll(ARRAY) – Adds the list of files into the cache.
+• cache.add(fileURL) – Adds the  files into the cache.
+
+         cache.put() - for blobs
+        • caches.keys() – Returns the whole list of cache names.
+• caches.delete(NAME) – Delete the specified cache.
+        */
+    </script>
+</body>
+</html>
