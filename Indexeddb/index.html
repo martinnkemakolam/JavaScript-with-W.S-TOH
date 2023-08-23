@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btn">New transaction</button>
+    <script>
+        let req = indexedDB.open('learn', 1)
+        req.error = function (err) {
+            console.error(err)
+        }
+        req.onupgradeneeded = function (evt) {
+            let db = req.result
+            let store = db.createObjectStore('Resturant', {keyPath: 'food'})
+            store.createIndex('index1', ['food', 'price'], {unique: false})
+        }
+        req.onsuccess = function (evt) {
+            let db = req.result
+            let transction = db.transaction('Resturant', 'readwrite')
+            let transactStore = transction.objectStore('Resturant')
+            let foodAndPriceIndex = transactStore.index('index1')
+            transactStore.put({id: 0, food: 'Garri', price: '1000'})
+            transactStore.put({id: 0, food: 'noddle', price: '700'})
+            transactStore.put({id: 0, food: 'Ukwa', price: '1000'})
+            transactStore.put({id: 0, food: 'Rice', price: '1500'})
+
+            let defaultQuery = transactStore.get('noddle')
+            let foodAndPriceQuery = foodAndPriceIndex.get(['noddle', '700'])
+            
+            defaultQuery.onsuccess = function (evt) {
+                console.log('defaultQuery', defaultQuery.result)
+            }
+            foodAndPriceQuery.onsuccess = function () {
+                console.log('Price', foodAndPriceQuery.result)
+            }
+            transction.oncomplete = function () {
+                db.close()
+            }
+        }
+
+        let newReq = indexedDB.open('learn', 1)
+        newReq.onsuccess = function (params) {
+            let db = newReq.result
+            document.querySelector('#btn').onclick = function () {
+                let transaction = db.transaction('Resturant', 'readwrite')
+                let transactStore = transaction.objectStore('Resturant')
+                let store = transactStore.get('Garri')
+                store.onsuccess = function () {
+                    store.result.price = '1500'
+                    transactStore.put(store.result)
+                }
+                transactStore.delete('Rice')
+            }
+        }
+    </script>
+</body>
+</html>
